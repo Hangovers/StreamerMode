@@ -7,6 +7,7 @@ Dalamud plugin that hides every plugin and Dalamud UI element with a single chat
 - Hides **all plugin windows** (every window registered through `UiBuilder.Draw` / the global ImGui `Draw` event).
 - Hides **all Dalamud windows** — settings window, plugin installer, `/xllog` log window, console, dev menu, and title-screen badges.
 - Hides the **"Dalamud Plugins" / "Dalamud Settings"** entries from the Escape (system) menu.
+- Hides **DTR (Server Info Bar)** entries injected by plugins (the top bar, e.g. vnavmesh "AI: Off / Mesh: Ready" — a native `_DTR` addon not covered by the ImGui `IsDispatchingEvents` flag).
 - Hides **toast notifications** (`NotificationManager`).
 - Controlled **only via chat** — there is no clickable UI toggle, so nothing on screen betrays that plugins are present.
 - While active, the per-frame ImGui UI build is skipped entirely, which **reduces CPU usage**.
@@ -61,6 +62,7 @@ Output is in `StreamerMode/bin/Release/StreamerMode/` (`StreamerMode.dll` + `Str
 
 - Targets **Dalamud API 15** on **.NET 10** (`Dalamud.NET.Sdk/15.0.0`, `net10.0-windows`).
 - Relies on **reflection over an `internal` Dalamud type** (`InterfaceManager` / `Service<T>` / `IsDispatchingEvents`). A future Dalamud update may rename or move these internals and break the plugin — in that case the plugin **logs an error to `/xllog` instead of crashing** and leaves the state unchanged.
+- The DTR hiding is **reinforced every frame** while active (via `IFramework.Update`), because some plugins (e.g. vnavmesh) re-set `Shown = true` on every tick.
 - `Dispose()` **always restores** `IsDispatchingEvents` to `true`, so the Dalamud UI is never left permanently hidden if the plugin is unloaded or disabled.
 - Intended for **personal use**. The official Dalamud plugin repository (D17) would reject reflection over Dalamud internals, so this plugin is not suitable for submission there.
 

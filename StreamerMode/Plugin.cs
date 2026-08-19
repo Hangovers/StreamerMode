@@ -4,6 +4,7 @@ public sealed class Plugin : IDalamudPlugin
 {
     private readonly IDalamudPluginInterface _pluginInterface;
     private readonly Commands _commands;
+    private readonly DtrHider _dtrHider = new();
 
     private bool _enabled;
 
@@ -13,6 +14,9 @@ public sealed class Plugin : IDalamudPlugin
         _pluginInterface.Create<Service>();
 
         _commands = new Commands(this);
+        Service.Framework.Update += OnUpdate;
+        _pluginInterface.UiBuilder.OpenConfigUi += OnOpenConfigUi;
+        _pluginInterface.UiBuilder.OpenMainUi += OnOpenMainUi;
 
         Service.PluginLog.Information("Streamer Mode loaded. Type /streamer to toggle.");
     }
@@ -24,6 +28,10 @@ public sealed class Plugin : IDalamudPlugin
     public void Dispose()
     {
         _commands.Dispose();
+        Service.Framework.Update -= OnUpdate;
+        _pluginInterface.UiBuilder.OpenConfigUi -= OnOpenConfigUi;
+        _pluginInterface.UiBuilder.OpenMainUi -= OnOpenMainUi;
+        _dtrHider.RestoreAll();
         DalamudInternals.SetDispatchingEvents(true);
     }
 
@@ -41,9 +49,25 @@ public sealed class Plugin : IDalamudPlugin
             return;
         }
 
+        if (enabled)
+            _dtrHider.HideAll();
+        else
+            _dtrHider.RestoreAll();
+
         _enabled = enabled;
         Service.PluginLog.Information("Streamer Mode {0}.", enabled
             ? "ENABLED — all plugin and Dalamud UI hidden"
             : "disabled — UI restored");
     }
+
+    private void OnUpdate(IFramework _)
+    {
+        if (_enabled) _dtrHider.EnforceHidden();
+    }
+
+    private void OnOpenConfigUi()
+        => Service.ChatGui.Print("Streamer Mode has no settings window — use /streamer on|off|status.");
+
+    private void OnOpenMainUi()
+        => Service.ChatGui.Print("Streamer Mode has no main window — use /streamer on|off|status.");
 }
