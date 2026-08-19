@@ -4,6 +4,7 @@ internal static class DalamudInternals
 {
     private static object? _interfaceManager;
     private static PropertyInfo? _isDispatchingEvents;
+    private static FieldInfo? _lastWantCapture;
     private static bool _initialized;
 
     private static void EnsureInitialized()
@@ -41,6 +42,17 @@ internal static class DalamudInternals
             {
                 Service.PluginLog?.Error("Streamer Mode: IsDispatchingEvents property not found. Incompatible Dalamud version?");
             }
+
+            // Fixes alt-tab blocked-click SE: InterfaceManager.lastWantCapture is a private bool
+            // set in Display() before the IsDispatchingEvents check. When we hide, it stays true
+            // for one frame, causing SetCursorDetour/ProcessWndProcW to swallow the stray mouse
+            // Wine/KDE synthesizes on focus restore, which FFXIV plays as blocked-click. Clear it
+            // immediately when toggling so input falls through right away.
+            _lastWantCapture = interfaceManagerType.GetField("lastWantCapture", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (_lastWantCapture == null)
+            {
+                Service.PluginLog?.Warning("Streamer Mode: lastWantCapture field not found — alt-tab SE fix disabled.");
+            }
         }
         catch (Exception ex)
         {
@@ -61,6 +73,18 @@ internal static class DalamudInternals
         try
         {
             _isDispatchingEvents.SetValue(_interfaceManager, value);
+            if (!value)
+            {
+                try
+                {
+                    _lastWantCapture?.SetValue(_interfaceManager, false);
+                }
+                catch (Exception ex2)
+                {
+                    Service.PluginLog?.Warning(ex2, "Streamer Mode: failed to clear lastWantCapture (non-fatal).");
+                }
+            }
+
             return true;
         }
         catch (Exception ex)
