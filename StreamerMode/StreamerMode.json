@@ -1,0 +1,12 @@
+{
+  "Author": "Hangovers",
+  "Name": "StreamerMode",
+  "Punchline": "One command to hide every plugin & Dalamud UI element.",
+  "Description": "Hides all plugin windows, all Dalamud windows (settings, installer, log, console, dev menu, title-screen badges) and the Dalamud entries in the system (Escape) menu with a single slash command — controllable ONLY via chat, so nothing on screen reveals you are running plugins. While active it also skips the entire per-frame UI build, reducing the CPU load Dalamud adds. Usage: /streamer (toggle) | /streamer on | /streamer off | /streamer status",
+  "ApplicableVersion": "any",
+  "RepoUrl": "https://github.com/Hangovers/StreamerMode",
+  "Tags": ["streamer", "streaming", "hide", "ui", "privacy"],
+  "CategoryTags": ["UI"],
+  "LoadPriority": 0,
+  "IsHide": false
+}

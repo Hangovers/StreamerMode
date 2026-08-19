@@ -45,14 +45,14 @@ This single flag therefore governs the global ImGui draw, the notification manag
 wget -q https://goatcorp.github.io/dalamud-distrib/latest.zip -O /tmp/dalamud.zip
 rm -rf /tmp/dalamud && mkdir -p /tmp/dalamud && unzip -q /tmp/dalamud.zip -d /tmp/dalamud
 export DALAMUD_HOME=/tmp/dalamud
-dotnet build -c Release
+dotnet build StreamerMode.sln -c Release
 ```
 
-Output is in `bin/Release/StreamerMode/` (`StreamerMode.dll` + auto-generated `StreamerMode.json` manifest).
+Output is in `StreamerMode/bin/Release/StreamerMode/` (`StreamerMode.dll` + `StreamerMode.json` manifest).
 
 ## Installing (dev)
 
-1. Copy the built `bin/Release/StreamerMode/` folder to your gaming PC.
+1. Copy the built `StreamerMode/bin/Release/StreamerMode/` folder to your gaming PC.
 2. In-game run `/xldev` → *Experimental* → add the folder under **Dev Plugin Locations**.
 3. Reload/re-enable the plugin from the plugin installer (or restart the game).
 4. Run `/streamer` in chat to toggle.
@@ -66,4 +66,4 @@ Output is in `bin/Release/StreamerMode/` (`StreamerMode.dll` + auto-generated `S
 
 ## License
 
-MIT — see [LICENSE.md](LICENSE.md).
+MIT — see [LICENSE](LICENSE).

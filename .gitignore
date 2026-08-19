@@ -1,7 +1,11 @@
-bin/
-obj/
-*.user
+# Build outputs
+**/bin/
+**/obj/
+
+# IDE / tooling
 .vs/
-.idea/
-*.suo
-*.userprefs
+*.user
+
+# Never commit the internal spec to GitHub (user rule)
+SPEC.md
+*.zip
